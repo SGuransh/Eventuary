@@ -63,15 +63,41 @@ export default function Home() {
     setEvents(mockEvents)
   }
 
-  const fetchRecommendations = () => {
-    // This would be an API call to AWS Personalize
-    const mockRecommendations = [
-      { title: "AI Ethics Symposium", description: "Join us for a discussion on the ethical implications of AI in today's society.", date: "2024-11-15", time: "14:00", location: "Bahen Centre", tags: ["AI", "Ethics"] },
-      { title: "Data Science Workshop", description: "Learn the latest techniques in data analysis and visualization.", date: "2024-11-20", time: "10:00", location: "Myhal Centre", tags: ["Data Science", "Workshop"] },
-      { title: "Music and Technology Concert", description: "Experience the intersection of classical music and modern technology.", date: "2024-12-06", time: "19:00", location: "Walter Hall", tags: ["Music", "Technology"] },
-    ]
-    setRecommendations(mockRecommendations)
-  }
+  const fetchRecommendations = async () => {
+    try {
+      // Replace with your actual API Gateway endpoint
+      const apiUrl = "https://ldbdnwzd9e.execute-api.us-west-2.amazonaws.com/dev";
+  
+      // Replace with the current user's username (e.g., fetched from Cognito or your auth provider)
+      const userName = "currentSignedInUser"; // Dynamically set this
+  
+      const response = await fetch(apiUrl, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          // Include Authorization header if needed
+          Authorization: `Bearer ${localStorage.getItem("userToken")}`, // Example for token-based auth
+        },
+        body: JSON.stringify({ userName }),
+      });
+  
+      if (!response.ok) {
+        throw new Error(`Failed to fetch recommendations: ${response.statusText}`);
+      }
+  
+      const data = await response.json();
+      setRecommendations(data.recommendedEvents || []);
+    } catch (error) {
+      const mockRecommendations = [
+        { title: "AI Ethics Symposium", description: "Join us for a discussion on the ethical implications of AI in today's society.", date: "2024-11-15", time: "14:00", location: "Bahen Centre", tags: ["AI", "Ethics"] },
+        { title: "Data Science Workshop", description: "Learn the latest techniques in data analysis and visualization.", date: "2024-11-20", time: "10:00", location: "Myhal Centre", tags: ["Data Science", "Workshop"] },
+        { title: "Music and Technology Concert", description: "Experience the intersection of classical music and modern technology.", date: "2024-12-06", time: "19:00", location: "Walter Hall", tags: ["Music", "Technology"] },
+      ]
+
+      setRecommendations(mockRecommendations)
+      console.error("Error fetching recommendations:", error);
+    }
+  };
 
   const syncCalendar = () => {
     // This would integrate with AWS AppSync for real-time calendar synchronization
