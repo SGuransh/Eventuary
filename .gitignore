@@ -6,7 +6,7 @@ __pycache__/
 *.log
 
 # Virtual environment
-hack/
+venv/
 env/
 
 # Django-specific
